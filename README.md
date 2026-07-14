@@ -20,12 +20,17 @@ I built this CRUD API to manage a simple to-do list while getting hands-on exper
 ## How to Run
 
 Install dependencies:
+
+```
 pip install -r requirements.txt
+```
 
 Start the server:
-uvicorn main:app --reload
 
-Then open the API at http://127.0.0.1:8000 and the Swagger docs at http://127.0.0.1:8000/docs
+```
+uvicorn main:app --reload
+```
+
 
 ## Endpoints
 
@@ -41,15 +46,16 @@ Then open the API at http://127.0.0.1:8000 and the Swagger docs at http://127.0.
 
 ## Example curl Output
 
-Here is the response when retrieving the default first task by its ID:
+```
 $ curl -i http://127.0.0.1:8000/tasks/1
 HTTP/1.1 200 OK
 date: Tue, 14 Jul 2026 23:32:43 GMT
 server: uvicorn
 content-length: 45
 content-type: application/json
-{"id": 1, "title": "Buy milk", "done": false}
 
+{"id": 1, "title": "Buy milk", "done": false}
+```
 ## Swagger UI
 
 ![Swagger UI](swagger.png)
