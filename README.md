@@ -63,3 +63,11 @@ content-type: application/json
 ## In-Memory Storage
 
 For simplicity, this API stores all tasks directly inside a standard Python list rather than a persistent database. This means that any tasks you create, update, or delete will completely reset whenever the Uvicorn server restarts.
+
+
+## Stage 4: Example SQL Query
+
+Query:
+SELECT * FROM tasks WHERE done = 1;
+
+Result: Returns all completed tasks.x
