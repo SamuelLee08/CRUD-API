@@ -1,18 +1,23 @@
-import sqlite3
+import os
+import psycopg
+from psycopg.rows import dict_row
+from dotenv import load_dotenv
 
-DATABASE = "tasks.db"
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 def init_db():
     """Create database and table if they don't exist."""
-    conn = sqlite3.connect(DATABASE)
+    conn = psycopg.connect(DATABASE_URL)
     cursor = conn.cursor()
     
     # Create table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             title TEXT NOT NULL,
-            done BOOLEAN NOT NULL DEFAULT 0
+            done BOOLEAN NOT NULL DEFAULT false
         )
     """)
     
@@ -22,16 +27,25 @@ def init_db():
     
     # Insert examples only when count is 0
     if count == 0:
-        cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", ("Buy milk", 0))
-        cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", ("Walk the dog", 1))
-        cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", ("Study FastAPI", 0))
+        cursor.execute(
+            "INSERT INTO tasks (title, done) VALUES (%s, %s)",
+            ("Buy milk", False)
+        )
+        cursor.execute(
+            "INSERT INTO tasks (title, done) VALUES (%s, %s)",
+            ("Walk the dog", True)
+        )
+        cursor.execute(
+            "INSERT INTO tasks (title, done) VALUES (%s, %s)",
+            ("Study FastAPI", False)
+        )
     
     conn.commit()
+    cursor.close()
     conn.close()
 
 def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
     return conn
 
 init_db()

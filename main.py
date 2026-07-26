@@ -41,7 +41,7 @@ def get_task(task_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("SELECT * FROM tasks WHERE id = %s", (task_id,))
     row = cursor.fetchone()
     conn.close()
     
@@ -59,13 +59,12 @@ def create_task(task: TaskCreate):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", (title, 0))
+    cursor.execute("INSERT INTO tasks (title, done) VALUES (%s, %s) RETURNING id", (title, False))
+    new_id = cursor.fetchone()[0]
     conn.commit()
-    
-    new_id = cursor.lastrowid
     conn.close()
     
-    return {"id": new_id, "title": title, "done": 0}
+    return {"id": new_id, "title": title, "done": False}
 
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, task: TaskUpdate):
@@ -76,7 +75,7 @@ def update_task(task_id: int, task: TaskUpdate):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("SELECT * FROM tasks WHERE id = %s", (task_id,))
     existing = cursor.fetchone()
     
     if existing is None:
@@ -84,10 +83,10 @@ def update_task(task_id: int, task: TaskUpdate):
         return JSONResponse(status_code=404, content={"error": "Task not found"})
     
     if task.done is not None:
-        cursor.execute("UPDATE tasks SET title = ?, done = ? WHERE id = ?", 
+        cursor.execute("UPDATE tasks SET title = %s, done = %s WHERE id = %s", 
                       (title, task.done, task_id))
     else:
-        cursor.execute("UPDATE tasks SET title = ? WHERE id = ?", 
+        cursor.execute("UPDATE tasks SET title = %s WHERE id = %s", 
                       (title, task_id))
     
     conn.commit()
@@ -101,13 +100,16 @@ def delete_task(task_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute("SELECT id FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("SELECT id FROM tasks WHERE id = %s", (task_id,))
     if cursor.fetchone() is None:
         conn.close()
         return JSONResponse(status_code=404, content={"error": "Task not found"})
     
-    cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("DELETE FROM tasks WHERE id = %s", (task_id,))
     conn.commit()
     conn.close()
     
     return None
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=3000)
