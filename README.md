@@ -85,3 +85,12 @@ docker exec -it task-api-db-1 psql -U postgres -d tasks -c "SELECT * FROM tasks;
 - **Docker & Docker Compose** — Containerization
 - **psycopg** — Postgres driver for Python
 - **Uvicorn** — ASGI server
+
+## Development Journey
+
+This project evolved through three storage iterations:
+- **A1**: In-memory storage (list)
+- **A2**: SQLite file storage
+- **A3**: Containerized PostgreSQL with Docker Compose
+
+The API behavior stayed identical throughout — only the storage engine changed. Check the git history to see each stage.
