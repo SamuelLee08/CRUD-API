@@ -1,6 +1,6 @@
 # Task API
 
-I built this CRUD API to manage a simple to-do list while getting hands-on experience with backend development in Python using FastAPI. Through this project, I practiced designing robust REST endpoints, implementing input validation, and mapping appropriate HTTP status codes to different server responses. I also utilized FastAPI's built-in Swagger UI to interactively test my routes and ensure everything works seamlessly.
+I built this CRUD API to manage a simple to-do list while getting hands-on experience with backend development in Python using FastAPI. Through this project, I practiced designing robust REST endpoints, implementing input validation, and mapping appropriate HTTP status codes to different server responses. I also utilized FastAPI's built-in Swagger UI to interactively test my routes and ensure everything works seamlessly.   
 
 ## Features
 
@@ -71,3 +71,16 @@ Query:
 SELECT * FROM tasks WHERE done = 1;
 
 Result: Returns all completed tasks.x
+
+## Running Locally
+
+First, start Postgres in Docker:
+```bash
+docker run --name taskdb -e POSTGRES_PASSWORD=dev -e POSTGRES_DB=tasks \
+ -p 5432:5432 -v taskdata:/var/lib/postgresql -d postgres
+```
+
+Then start your app:
+```bash
+python main.py
+```
