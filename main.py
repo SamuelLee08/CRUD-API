@@ -60,7 +60,8 @@ def create_task(task: TaskCreate):
     cursor = conn.cursor()
     
     cursor.execute("INSERT INTO tasks (title, done) VALUES (%s, %s) RETURNING id", (title, False))
-    new_id = cursor.fetchone()[0]
+    result = cursor.fetchone()
+    new_id = result['id']
     conn.commit()
     conn.close()
     
@@ -110,6 +111,7 @@ def delete_task(task_id: int):
     conn.close()
     
     return None
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=3000)
