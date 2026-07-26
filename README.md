@@ -1,86 +1,87 @@
 # Task API
 
-I built this CRUD API to manage a simple to-do list while getting hands-on experience with backend development in Python using FastAPI. Through this project, I practiced designing robust REST endpoints, implementing input validation, and mapping appropriate HTTP status codes to different server responses. I also utilized FastAPI's built-in Swagger UI to interactively test my routes and ensure everything works seamlessly.   
+A containerized CRUD API for managing tasks, built with FastAPI and PostgreSQL.
 
-## Features
+## Running Locally
 
-- Create, read, update, and delete tasks
-- View all tasks or a single task by ID
-- Validation that rejects empty titles
-- JSON error messages with correct HTTP status codes
-- Interactive testing through Swagger UI
+The entire stack (app + database) starts with one command:
 
-## Technologies Used
-
-- Python
-- FastAPI
-- Uvicorn
-- Git & GitHub
-
-## How to Run
-
-Install dependencies:
-
-```
-pip install -r requirements.txt
+```bash
+docker compose up
 ```
 
-Start the server:
+That's it. No manual setup needed.
 
-```
-uvicorn main:app --reload
+## Setup
+
+1. Clone the repo:
+```bash
+git clone https://github.com/SamuelLee08/CRUD-API.git
+cd CRUD-API
 ```
 
+2. Copy the environment template:
+```bash
+cp .env.example .env
+```
+
+3. Start the stack:
+```bash
+docker compose up
+```
+
+The API will be running on `http://localhost:3000`.
 
 ## Endpoints
 
 | Method | Endpoint | Purpose | Success Code |
 |--------|----------|---------|--------------|
-| GET | `/` | Describe the API | 200 |
 | GET | `/health` | Check the server is running | 200 |
 | GET | `/tasks` | List all tasks | 200 |
-| GET | `/tasks/{task_id}` | Get one task | 200 |
+| GET | `/tasks/{id}` | Get one task | 200 |
 | POST | `/tasks` | Create a task | 201 |
-| PUT | `/tasks/{task_id}` | Update a task | 200 |
-| DELETE | `/tasks/{task_id}` | Delete a task | 204 |
+| PUT | `/tasks/{id}` | Update a task | 200 |
+| DELETE | `/tasks/{id}` | Delete a task | 204 |
 
-## Example curl Output
+## Example curl Commands
 
-```
-$ curl -i http://127.0.0.1:8000/tasks/1
-HTTP/1.1 200 OK
-date: Tue, 14 Jul 2026 23:32:43 GMT
-server: uvicorn
-content-length: 45
-content-type: application/json
-
-{"id": 1, "title": "Buy milk", "done": false}
-```
-## Swagger UI
-
-![Swagger UI](swagger.png)
-
-## In-Memory Storage
-
-For simplicity, this API stores all tasks directly inside a standard Python list rather than a persistent database. This means that any tasks you create, update, or delete will completely reset whenever the Uvicorn server restarts.
-
-
-## Stage 4: Example SQL Query
-
-Query:
-SELECT * FROM tasks WHERE done = 1;
-
-Result: Returns all completed tasks.x
-
-## Running Locally
-
-First, start Postgres in Docker:
+Get all tasks:
 ```bash
-docker run --name taskdb -e POSTGRES_PASSWORD=dev -e POSTGRES_DB=tasks \
- -p 5432:5432 -v taskdata:/var/lib/postgresql -d postgres
+curl http://localhost:3000/tasks
 ```
 
-Then start your app:
+Create a task:
 ```bash
-python main.py
+curl -X POST http://localhost:3000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Buy milk"}'
 ```
+
+Update a task:
+```bash
+curl -X PUT http://localhost:3000/tasks/1 \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Updated title","done":true}'
+```
+
+Delete a task:
+```bash
+curl -X DELETE http://localhost:3000/tasks/1
+```
+
+## Database
+
+PostgreSQL runs in a Docker container. Data persists in the `taskdata` volume.
+
+View the data:
+```bash
+docker exec -it task-api-db-1 psql -U postgres -d tasks -c "SELECT * FROM tasks;"
+```
+
+## Tech Stack
+
+- **FastAPI** — Web framework
+- **PostgreSQL** — Database  
+- **Docker & Docker Compose** — Containerization
+- **psycopg** — Postgres driver for Python
+- **Uvicorn** — ASGI server
